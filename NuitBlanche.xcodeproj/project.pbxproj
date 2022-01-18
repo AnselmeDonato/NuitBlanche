@@ -42,6 +42,12 @@
 		9C03B08527962C120063332C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		9C03B08727962C170063332C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9C03B08927962C1E0063332C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		9CF85652279630490070FA93 /* Camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		9CF85653279630DB0070FA93 /* Shader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Shader.hpp; sourceTree = "<group>"; };
+		9CF856542796311A0070FA93 /* vertexShader.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = vertexShader.glsl; sourceTree = "<group>"; };
+		9CF85655279631420070FA93 /* fragmentShader.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = fragmentShader.glsl; sourceTree = "<group>"; };
+		9CF856562796318A0070FA93 /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		9CF856572796320C0070FA93 /* glm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,7 +88,12 @@
 		9C03B06E27962A6C0063332C /* NuitBlanche */ = {
 			isa = PBXGroup;
 			children = (
+				9CF856562796318A0070FA93 /* stb_image.h */,
 				9C03B06F27962A6C0063332C /* main.cpp */,
+				9CF85652279630490070FA93 /* Camera.h */,
+				9CF85653279630DB0070FA93 /* Shader.hpp */,
+				9CF856542796311A0070FA93 /* vertexShader.glsl */,
+				9CF85655279631420070FA93 /* fragmentShader.glsl */,
 			);
 			path = NuitBlanche;
 			sourceTree = "<group>";
@@ -108,6 +119,7 @@
 		9C03B07827962AD40063332C /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				9CF856572796320C0070FA93 /* glm */,
 				9C03B07F27962B7A0063332C /* KHR */,
 				9C03B07E27962B750063332C /* GLFW */,
 				9C03B07D27962B350063332C /* glad */,

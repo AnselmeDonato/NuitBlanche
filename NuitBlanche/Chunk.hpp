@@ -20,48 +20,70 @@ class Chunk {
     
 private:
     std::vector<glm::vec3> m_cubePositions;
+    std::vector<glm::vec3> m_xFacePositions;
+    std::vector<glm::vec3> m_yFacePositions;
+    std::vector<glm::vec3> m_zFacePositions;
+    std::vector<std::vector<std::vector<int>>> m_listCubes; //3D list
     unsigned int m_VBO, m_VAO, m_texture;
+    unsigned int m_xVBO, m_xVAO, m_yVBO, m_yVAO, m_zVBO, m_zVAO;
+    long int m_posX, m_posY;
     
-public:
-    Chunk() {
-        
-        float m_vertices[] = {
+    
+    // ---------- J'en ai rien à foutre je vais faire 3 passes pour rendre le chunk de manière "optimisée". Les chiens aboient, la caravane passe --------//
+    
+    void buildX(){
+        float _vertices[] = {
             // positions          // texture coords
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  0.1f, 0.0f,
-             0.5f,  0.5f, -0.5f,  0.1f, 0.1f,
-             0.5f,  0.5f, -0.5f,  0.1f, 0.1f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 0.1f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
+            0.5f,  0.5f, -0.5f,  0.1f, 0.1f,
+            0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
+            0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
+            0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
+        };
+        
+        m_xFacePositions.clear();
+        
+        for (int x = 0; x < 16; x++){
+            for (int y = 0; y < 16; y ++){
+                for (int z = 0; z < 16; z ++){
+                    
+                    if (x == 15){//Top of the chunk, always rendered
+                        if(m_listCubes[x][y][z] == 1){
+                            m_xFacePositions.push_back(glm::vec3(x,y,z));
+                        }
+                    }
+                    
+                    else { //Middle of the chunk
+                        if(m_listCubes[x][y][z] == 1 && m_listCubes[x+1][y][z] == 0){
+                            m_xFacePositions.push_back(glm::vec3(x,y,z));
+                        }
+                    }
+                }
+            }
+        }
+        
+        glGenVertexArrays(1, &m_xVAO);
+        glGenBuffers(1, &m_xVBO);
 
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.1f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.1f, 0.1f,
-             0.5f,  0.5f,  0.5f,  0.1f, 0.1f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.1f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        glBindVertexArray(m_xVAO);
 
-            -0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.1f, 0.1f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
-            
-             0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
-             0.5f,  0.5f, -0.5f,  0.1f, 0.1f,
-             0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
-             0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
-             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
+        glBindBuffer(GL_ARRAY_BUFFER, m_xVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices), _vertices, GL_STATIC_DRAW);
 
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
-             0.5f, -0.5f, -0.5f,  0.1f, 0.1f,
-             0.5f, -0.5f,  0.5f,  0.1f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.1f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.1f,
-            
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        // texture coord attribute
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    };
+    
+    
+    
+    void buildY(){
+        float _vertices[] = {
+            // positions          // texture coords
             -0.5f,  0.5f, -0.5f,  0.0f, 0.1f,
              0.5f,  0.5f, -0.5f,  0.1f, 0.1f,
              0.5f,  0.5f,  0.5f,  0.1f, 0.0f,
@@ -70,20 +92,34 @@ public:
             -0.5f,  0.5f, -0.5f,  0.0f, 0.1f
         };
         
-        // world space positions of our cubes
-        for (int x = 0; x < 16; x ++){
-            for(int z = 0; z < 16; z ++){
-                m_cubePositions.push_back(glm::vec3( x, 0, z));
+        m_yFacePositions.clear();
+        
+        for (int x = 0; x < 16; x++){
+            for (int y = 0; y < 16; y ++){
+                for (int z = 0; z < 16; z ++){
+                    
+                    if (y == 15){//Top of the chunk, always rendered
+                        if(m_listCubes[x][y][z] == 1){
+                            m_yFacePositions.push_back(glm::vec3(x,y,z));
+                        }
+                    }
+                    
+                    else { //Middle of the chunk
+                        if(m_listCubes[x][y][z] == 1 && m_listCubes[x][y+1][z] == 0){
+                            m_yFacePositions.push_back(glm::vec3(x,y,z));
+                        }
+                    }
+                }
             }
         }
-    
-        glGenVertexArrays(1, &m_VAO);
-        glGenBuffers(1, &m_VBO);
+        
+        glGenVertexArrays(1, &m_yVAO);
+        glGenBuffers(1, &m_yVBO);
 
-        glBindVertexArray(m_VAO);
+        glBindVertexArray(m_yVAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_yVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices), _vertices, GL_STATIC_DRAW);
 
         // position attribute
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -91,7 +127,68 @@ public:
         // texture coord attribute
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
+    };
+    
+    
+    
+    
+    void buildZ(){
+        float _vertices[] = {
+            // positions          // texture coords
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  0.1f, 0.0f,
+             0.5f,  0.5f,  0.5f,  0.1f, 0.1f,
+             0.5f,  0.5f,  0.5f,  0.1f, 0.1f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.1f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f
+        };
         
+        m_zFacePositions.clear();
+        
+        for (int x = 0; x < 16; x++){
+            for (int y = 0; y < 16; y ++){
+                for (int z = 0; z < 16; z ++){
+                    
+                    if (z == 15){//Top of the chunk, always rendered
+                        if(m_listCubes[x][y][z] == 1){
+                            m_zFacePositions.push_back(glm::vec3(x,y,z));
+                        }
+                    }
+                    
+                    else { //Middle of the chunk
+                        if(m_listCubes[x][y][z] == 1 && m_listCubes[x][y][z+1] == 0){
+                            m_zFacePositions.push_back(glm::vec3(x,y,z));
+                        }
+                    }
+                }
+            }
+        }
+        
+        glGenVertexArrays(1, &m_zVAO);
+        glGenBuffers(1, &m_zVBO);
+
+        glBindVertexArray(m_zVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_zVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices), _vertices, GL_STATIC_DRAW);
+
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        // texture coord attribute
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    };
+    
+    // ---------------------------------------------------------------------------------------------------------------------------------------------------//
+    
+public:
+    Chunk() : m_listCubes(16, std::vector<std::vector<int> >(16, std::vector<int>(16, 1))) {
+        
+        buildX();
+        buildY();
+        buildZ();
+
         // Textures
         glGenTextures(1, &m_texture);
         glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -120,12 +217,34 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_texture);
         
-        glBindVertexArray(m_VAO);
-        for (unsigned int i = 0; i < m_cubePositions.size(); i++)
+        glBindVertexArray(m_xVAO);
+        for (unsigned int i = 0; i < m_xFacePositions.size(); i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, m_cubePositions[i]);
+            model = glm::translate(model, m_xFacePositions[i]);
+            _shader.setMatrix4fv("model", glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        
+        glBindVertexArray(m_yVAO);
+        for (unsigned int i = 0; i < m_yFacePositions.size(); i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m_yFacePositions[i]);
+            _shader.setMatrix4fv("model", glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        
+        glBindVertexArray(m_zVAO);
+        for (unsigned int i = 0; i < m_zFacePositions.size(); i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m_zFacePositions[i]);
             _shader.setMatrix4fv("model", glm::value_ptr(model));
 
             glDrawArrays(GL_TRIANGLES, 0, 36);

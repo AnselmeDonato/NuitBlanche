@@ -71,9 +71,9 @@ public:
         };
         
         // world space positions of our cubes
-        for (float x = 0.0f; x < 16.0; x += 1.0f){
-            for(float z = 0.0f; z < 16.0; z += 1.0f){
-                m_cubePositions.push_back(glm::vec3( x, 0.0f, z));
+        for (int x = 0; x < 16; x ++){
+            for(int z = 0; z < 16; z ++){
+                m_cubePositions.push_back(glm::vec3( x, 0, z));
             }
         }
     
@@ -134,4 +134,4 @@ public:
     };
 };
 
-#endif /* Camera_h */
+#endif /* Chunk_h */

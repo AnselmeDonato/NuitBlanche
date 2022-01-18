@@ -48,6 +48,7 @@
 		9CF85655279631420070FA93 /* fragmentShader.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = fragmentShader.glsl; sourceTree = "<group>"; };
 		9CF856562796318A0070FA93 /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		9CF856572796320C0070FA93 /* glm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glm; sourceTree = "<group>"; };
+		9CF8565C279645190070FA93 /* Chunk.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Chunk.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +95,7 @@
 				9CF85653279630DB0070FA93 /* Shader.hpp */,
 				9CF856542796311A0070FA93 /* vertexShader.glsl */,
 				9CF85655279631420070FA93 /* fragmentShader.glsl */,
+				9CF8565C279645190070FA93 /* Chunk.hpp */,
 			);
 			path = NuitBlanche;
 			sourceTree = "<group>";

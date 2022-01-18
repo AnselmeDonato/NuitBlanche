@@ -140,7 +140,7 @@ int main()
         return -1;
     }
 
-    Chunk m_chunk = Chunk();
+    Chunk m_chunk = Chunk(glm::vec3(0, 0, 0));
     
     //Shaders
     Shader _shader("/Users/anselmedonato/Desktop/Pas Telecom/OpenGL/NuitBlanche/NuitBlanche/vertexShader.glsl","/Users/anselmedonato/Desktop/Pas Telecom/OpenGL/NuitBlanche/NuitBlanche/fragmentShader.glsl");

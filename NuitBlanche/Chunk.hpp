@@ -19,17 +19,19 @@
 class Chunk {
     
 private:
-    std::vector<glm::vec3> m_cubePositions;
+    glm::vec3 m_chunkPosition;
     std::vector<glm::vec3> m_xFacePositions;
     std::vector<glm::vec3> m_yFacePositions;
     std::vector<glm::vec3> m_zFacePositions;
     std::vector<std::vector<std::vector<int>>> m_listCubes; //3D list
-    unsigned int m_VBO, m_VAO, m_texture;
+    unsigned int m_texture;
     unsigned int m_xVBO, m_xVAO, m_yVBO, m_yVAO, m_zVBO, m_zVAO;
     long int m_posX, m_posY;
     
     
     // ---------- J'en ai rien à foutre je vais faire 3 passes pour rendre le chunk de manière "optimisée". Les chiens aboient, la caravane passe --------//
+    //Les 3 fonctions suivantes, buildX, buildY et buildZ fonctionnent de la même manière et diffèrent juste par la face qu'elles vont rendre
+    //Même chose pour les fonctions renderX, renderY et renderZ.
     
     void buildX(){
         float _vertices[] = {
@@ -50,13 +52,13 @@ private:
                     
                     if (x == 15){//Top of the chunk, always rendered
                         if(m_listCubes[x][y][z] == 1){
-                            m_xFacePositions.push_back(glm::vec3(x,y,z));
+                            m_xFacePositions.push_back(glm::vec3(x,y,z) + m_chunkPosition);
                         }
                     }
                     
                     else { //Middle of the chunk
-                        if(m_listCubes[x][y][z] == 1 && m_listCubes[x+1][y][z] == 0){
-                            m_xFacePositions.push_back(glm::vec3(x,y,z));
+                        if(m_listCubes[x][y][z] + m_listCubes[x+1][y][z] == 1){
+                            m_xFacePositions.push_back(glm::vec3(x,y,z) + m_chunkPosition);
                         }
                     }
                 }
@@ -100,13 +102,13 @@ private:
                     
                     if (y == 15){//Top of the chunk, always rendered
                         if(m_listCubes[x][y][z] == 1){
-                            m_yFacePositions.push_back(glm::vec3(x,y,z));
+                            m_yFacePositions.push_back(glm::vec3(x,y,z) + m_chunkPosition);
                         }
                     }
                     
                     else { //Middle of the chunk
-                        if(m_listCubes[x][y][z] == 1 && m_listCubes[x][y+1][z] == 0){
-                            m_yFacePositions.push_back(glm::vec3(x,y,z));
+                        if(m_listCubes[x][y][z] + m_listCubes[x][y+1][z] == 1){
+                            m_yFacePositions.push_back(glm::vec3(x,y,z) + m_chunkPosition);
                         }
                     }
                 }
@@ -151,13 +153,13 @@ private:
                     
                     if (z == 15){//Top of the chunk, always rendered
                         if(m_listCubes[x][y][z] == 1){
-                            m_zFacePositions.push_back(glm::vec3(x,y,z));
+                            m_zFacePositions.push_back(glm::vec3(x,y,z) + m_chunkPosition);
                         }
                     }
                     
                     else { //Middle of the chunk
-                        if(m_listCubes[x][y][z] == 1 && m_listCubes[x][y][z+1] == 0){
-                            m_zFacePositions.push_back(glm::vec3(x,y,z));
+                        if(m_listCubes[x][y][z] + m_listCubes[x][y][z+1] == 1){
+                            m_zFacePositions.push_back(glm::vec3(x,y,z) + m_chunkPosition);
                         }
                     }
                 }
@@ -180,10 +182,52 @@ private:
         glEnableVertexAttribArray(1);
     };
     
-    // ---------------------------------------------------------------------------------------------------------------------------------------------------//
+    
+    void renderX(Shader _shader){
+        glBindVertexArray(m_xVAO);
+        for (unsigned int i = 0; i < m_xFacePositions.size(); i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m_xFacePositions[i]);
+            _shader.setMatrix4fv("model", glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+    };
+    
+    void renderY(Shader _shader){
+        glBindVertexArray(m_yVAO);
+        for (unsigned int i = 0; i < m_yFacePositions.size(); i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m_yFacePositions[i]);
+            _shader.setMatrix4fv("model", glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+    };
+    
+    void renderZ(Shader _shader){
+        glBindVertexArray(m_zVAO);
+        for (unsigned int i = 0; i < m_zFacePositions.size(); i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, m_zFacePositions[i]);
+            _shader.setMatrix4fv("model", glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+    };
+    
+    // --------------------------------------------- ça marche, nique les rageux --------------------------------------------------------------//
     
 public:
-    Chunk() : m_listCubes(16, std::vector<std::vector<int> >(16, std::vector<int>(16, 1))) {
+    Chunk(glm::vec3 _chunkPosition) : m_listCubes(16, std::vector<std::vector<int> >(16, std::vector<int>(16, 1))), m_chunkPosition(_chunkPosition) {
+        
+        m_listCubes[3][3][3] = 0;
         
         buildX();
         buildY();
@@ -217,39 +261,10 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_texture);
         
-        glBindVertexArray(m_xVAO);
-        for (unsigned int i = 0; i < m_xFacePositions.size(); i++)
-        {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, m_xFacePositions[i]);
-            _shader.setMatrix4fv("model", glm::value_ptr(model));
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        
-        glBindVertexArray(m_yVAO);
-        for (unsigned int i = 0; i < m_yFacePositions.size(); i++)
-        {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, m_yFacePositions[i]);
-            _shader.setMatrix4fv("model", glm::value_ptr(model));
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        
-        glBindVertexArray(m_zVAO);
-        for (unsigned int i = 0; i < m_zFacePositions.size(); i++)
-        {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, m_zFacePositions[i]);
-            _shader.setMatrix4fv("model", glm::value_ptr(model));
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        
+        //Rendering faces in each direction in an optimized way.
+        renderX(_shader);
+        renderY(_shader);
+        renderZ(_shader);
     };
 };
 
